@@ -1,0 +1,135 @@
+﻿[시스템 환경]
+1) Windows10 Anaconda 설치
+2) 작업 디렉터리 : D:\project
+
+
+시작 > 프로그램 > Anaconda3 > Anaconda Prompt 실행
+
+(base) C:\Users\두현>python --version
+Python 3.6.4 :: Anaconda, Inc.
+
+#가상환경 만들기
+(base) C:\Users\두현>python -m venv myvenv
+
+## 위와 같이 하면 myvenv라는 디렉토리가 만들어져요
+
++++++<장고 설치 후 작업 계속할 때마다 여기서부터 다시 실행>+++++++
+# 가상환경 사용하기 위해 프로젝트 디렉터리로 이동
+(base) C:\Users\두현>d:
+(base) d:\>cd project
+(base) d:\project>
+(base) d:\project>myvenv\Scripts\activate
+(myvenv) (base) d:\project>
++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# pip 최신 버전으로 업그레이드하기
+(myvenv) (base) python -m pip install --upgrade pip
+
+# 장고 설치하기 
+(myvenv) (base) pip install django~=2.0.0
+
+# 내 웹사이트의 기본 골격 만들기
+(myvenv) (base) D:\project\myvenv\Scripts>django-admin.py startproject mysite .
+시스템이 지정된 프로그램을 실행할 수 없습니다.
+
+## 에러 발생!
+
+# 현재 내 위치 정보
+(myvenv) (base) D:\project>cd
+D:\project
+
+# 앞에 파이썬 경로 붙여서 다시 실행해서 성공!
+(myvenv) (base) d:\project\myvenv\scripts\python.exe myvenv\Scripts\django-admin.py startproject mysite .
+
+# 생성된 mysite 디렉터리와 manage.py 파일 확인
+(myvenv) (base) D:\project>dir
+ D 드라이브의 볼륨: Data
+ 볼륨 일련 번호: AAE0-0F1A
+
+ D:\project 디렉터리
+
+2019-05-04  오전 10:33    <DIR>          .
+2019-05-04  오전 10:33    <DIR>          ..
+2019-05-04  오전 10:16               553 manage.py
+2019-05-04  오전 10:18    <DIR>          mysite
+2019-05-04  오전 10:09    <DIR>          myvenv
+2019-05-04  오전 10:24    <DIR>          작업일지
+
+
+# mysite/settings.py 설정파일 수정
+https://tutorial.djangogirls.org/ko/django_start_project/ 참고
+
+# 데이터베이스 생성하기
+(myvenv) (base) D:\project>python manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, sessions
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying sessions.0001_initial... OK
+  
+# 웹서버 시작! (로컬호스트에서만 접속하는 경우)
+(myvenv) (base) python manage.py runserver
+
+## 또는 (다른 PC에서 이 컴퓨터로 접속하는 경우)
+(myvenv) (base) python manage.py runserver 0:8000
+
+## 헉! 아래와 같이 에러 발생!
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xb9 in position 0:  invalid start byte
+
+# 컴퓨터 이름이 한글로 되어 있는 경우 위와 같은 에러 발생하므로 영어(예, kdh)로 변경해주기
+1) cmd창 관리자 권한으로 실행해서 
+2) wmic ComputerSystem Where Name="%COMPUTERNAME%" Call Rename Name="mindul"로 입력
+3) 컴퓨터 재부팅
+4) cmd창에서 컴퓨터 이름이 mindul로 변경된 것을 확인
+C:\Users\두현>hostname
+mindul
+
+-----------------------------------------------------------------------------------------------------
+## 재부팅해서 다시 시도해보니 웹서버 접속 성공!
+
+(base) C:\Users\두현>d:
+(base) D:\>cd project
+(base) D:\project>dir
+ D 드라이브의 볼륨: Data
+ 볼륨 일련 번호: AAE0-0F1A
+
+ D:\project 디렉터리
+
+2019-05-04  오전 10:39    <DIR>          .
+2019-05-04  오전 10:39    <DIR>          ..
+2019-05-04  오전 10:39           131,072 db.sqlite3
+2019-05-04  오전 10:16               553 manage.py
+2019-05-04  오전 10:39    <DIR>          mysite
+2019-05-04  오전 10:09    <DIR>          myvenv
+2019-05-04  오전 10:24    <DIR>          작업일지
+               2개 파일             131,625 바이트
+               5개 디렉터리  1,529,915,187,200 바이트 남음
+
+(base) C:\Users\두현>d:
+(base) d:\>cd project
+(base) d:\project>
+(base) d:\project>myvenv\Scripts\activate
+(myvenv) (base) d:\project>
+
+# 웹서버 실행
+(myvenv) (base) D:\project>python manage.py runserver
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 04, 2019 - 11:55:23
+Django version 2.0.13, using settings 'mysite.settings'
+Starting development server at http://127.0.0.1:8000/
+-----------------------------------------------------------------------------------------------------
+

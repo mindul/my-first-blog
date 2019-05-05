@@ -1,0 +1,167 @@
+# 나의 첫 번째 장고 프로젝트! 블로그 만들기
+
+# 블로그(blog) 생성하기
+(myvenv) (base) D:\project>python manage.py startapp blog
+
+# blog 디렉터리 생성 확인하기
+(myvenv) (base) D:\project>dir
+ D 드라이브의 볼륨: Data
+ 볼륨 일련 번호: AAE0-0F1A
+
+ D:\project 디렉터리
+
+2019-05-05  오후 01:45    <DIR>          .
+2019-05-05  오후 01:45    <DIR>          ..
+2019-05-05  오후 01:45    <DIR>          blog
+2019-05-04  오전 10:39           131,072 db.sqlite3
+2019-05-04  오전 10:16               553 manage.py
+2019-05-04  오전 10:39    <DIR>          mysite
+2019-05-04  오전 10:09    <DIR>          myvenv
+2019-05-05  오후 01:44    <DIR>          작업일지
+
+(myvenv) (base) D:\project>dir/s blog
+ D 드라이브의 볼륨: Data
+ 볼륨 일련 번호: AAE0-0F1A
+
+ D:\project\blog 디렉터리
+
+2019-05-05  오후 01:45    <DIR>          .
+2019-05-05  오후 01:45    <DIR>          ..
+2019-05-05  오후 01:45                66 admin.py
+2019-05-05  오후 01:45                88 apps.py
+2019-05-05  오후 01:45    <DIR>          migrations
+2019-05-05  오후 01:45                60 models.py
+2019-05-05  오후 01:45                63 tests.py
+2019-05-05  오후 01:45                66 views.py
+2019-05-05  오후 01:45                 0 __init__.py
+               6개 파일                 343 바이트
+
+ D:\project\blog\migrations 디렉터리
+
+2019-05-05  오후 01:45    <DIR>          .
+2019-05-05  오후 01:45    <DIR>          ..
+2019-05-05  오후 01:45                 0 __init__.py
+               1개 파일                   0 바이트
+			   
+------------------------------------------------------
+# 블로그 글 모델 만들기
+
+# blog/models.py 파일 편집
+## https://tutorial.djangogirls.org/ko/django_models/ 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Create your models here.
+from django.db import models
+from django.utils import timezone
+import pillow
+
+class Post(models.Model):
+    author = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    text = models.TextField()
+    created_date = models.DateTimeField(
+            default=timezone.now)
+    published_date = models.DateTimeField(
+            blank=True, null=True)
+
+	photo = models.ImageField()
+	photo_thumbnail = ImageSpecField(
+		source = 'photo', 		   			# 원본 ImageField 명
+		processors = [Thumbnail(100, 100)], # 처리할 작업목록
+		format = 'JPEG',		   			# 최종 저장 포맷
+		options = {'quality': 60}) 			# 저장 옵션
+	
+	
+    def publish(self):
+        self.published_date = timezone.now()
+        self.save()
+
+    def __str__(self):
+        return self.title
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# 데이터베이스에 모델을 위한 테이블 만들기
+(myvenv) (base) D:\project>python manage.py makemigrations blog
+Migrations for 'blog':
+  blog\migrations\0001_initial.py
+    - Create model Post
+
+# 실제 데이터베이스에 모델 추가를 반영(적용)
+(myvenv) (base) D:\project>python manage.py migrate blog
+Operations to perform:
+  Apply all migrations: blog
+Running migrations:
+  Applying blog.0001_initial... OK
+
+
+# 이미지 파일 처리를 위해 라이브러리 설치
+## https://wayhome25.github.io/django/2017/05/11/image-thumbnail/ 참고
+(myvenv) (base) D:\project>pip install pillow
+Collecting pillow
+  Downloading https://files.pythonhosted.org/packages/e6/37/fc5bde88462cf8a069e522dd6a0d259b69faba1326f0a3ce8b4e11d9f317/Pillow-6.0.0-cp36-cp36m-win_amd64.whl (2.0MB)
+     |████████████████████████████████| 2.0MB 3.3MB/s
+Installing collected packages: pillow
+Successfully installed pillow-6.0.0
+
+# PIL(Python Image Library) 설치
+(myvenv) (base) D:\project>pip install image
+Collecting image
+  Downloading https://files.pythonhosted.org/packages/0c/ec/51969468a8b87f631cc0e60a6bf1e5f6eec8ef3fd2ee45dc760d5a93b82a/image-1.5.27-py2.py3-none-any.whl
+Requirement already satisfied: django in d:\project\myvenv\lib\site-packages (from image) (2.0.13)
+Requirement already satisfied: pillow in d:\project\myvenv\lib\site-packages (from image) (6.0.0)
+Requirement already satisfied: pytz in d:\project\myvenv\lib\site-packages (from django->image) (2019.1)
+Installing collected packages: image
+Successfully installed image-1.5.27
+
+# PIL, Pillow를 좀 더 쓰기 쉽도록 도와주는 PILKit 라이브러리 설치
+(myvenv) (base) D:\project>pip install pilkit
+Collecting pilkit
+  Downloading https://files.pythonhosted.org/packages/c4/5c/318d9c20f309e6a79ea4d4605f86597d05f3e007d3d1925ff02474808659/pilkit-2.0.tar.gz (161kB)
+     |████████████████████████████████| 163kB 234kB/s
+Installing collected packages: pilkit
+  Running setup.py install for pilkit ... done
+Successfully installed pilkit-2.0
+
+# 장고 이미지 킷 설치
+(myvenv) (base) D:\project>pip install django-imagekit
+Collecting django-imagekit
+  Downloading https://files.pythonhosted.org/packages/e5/2a/a5c62376e897c23d1ce21be86c18e68096cb8c83df7d010d24ca81139e9e/django_imagekit-4.0.2-py2.py3-none-any.whl (47kB)
+     |████████████████████████████████| 51kB 648kB/s
+Collecting django-appconf>=0.5 (from django-imagekit)
+  Downloading https://files.pythonhosted.org/packages/f6/b3/fcec63afcf323581c4919f21e90ef8c8200034108a6a0ab47a6bf6a9327b/django_appconf-1.0.3-py2.py3-none-any.whl
+Requirement already satisfied: pilkit>=0.2.0 in d:\project\myvenv\lib\site-packages (from django-imagekit) (2.0)
+Collecting six (from django-imagekit)
+  Downloading https://files.pythonhosted.org/packages/73/fb/00a976f728d0d1fecfe898238ce23f502a721c0ac0ecfedb80e0d88c64e9/six-1.12.0-py2.py3-none-any.whl
+Requirement already satisfied: django in d:\project\myvenv\lib\site-packages (from django-appconf>=0.5->django-imagekit) (2.0.13)
+Requirement already satisfied: pytz in d:\project\myvenv\lib\site-packages (from django->django-appconf>=0.5->django-imagekit) (2019.1)
+Installing collected packages: six, django-appconf, django-imagekit
+Successfully installed django-appconf-1.0.3 django-imagekit-4.0.2 six-1.12.0
+
+
+# 데이터베이스에 모델을 위한 테이블 만들기
+## 데이터베이스에 우리의 새 모델, 'Post' 모델을 추가
+(myvenv) (base) D:\project>python manage.py makemigrations blog
+Migrations for 'blog':
+  blog\migrations\0001_initial.py
+    - Create model Post
+
+# 실제 데이터베이스에 모델 추가 반영(적용)하기
+(myvenv) (base) D:\project>python manage.py migrate blog
+Operations to perform:
+  Apply all migrations: blog
+Running migrations:
+  Applying blog.0001_initial... OK
+
+## 위의 두 가지 작업으로 글 모델이 데이터베이스에 저장!
+
+## 관리자 화면을 한국어로 변경하길 원할 경우 'settings.py'중 LANGUAGE_CODE = 'en-us'를 LANGUAGE_CODE = 'ko'로 바꾸세요
+# 관리자(administrator) 계정 만들기
+## ID: youradmin
+## PW: ekdtlsdmlrhksflwk0! (당신의관리자0!)
+(myvenv) (base) D:\project>python manage.py createsuperuser
+Username: youradmin
+Email address: educon@fsec.or.kr
+Password:
+Password (again):
+Superuser created successfully.
+
+

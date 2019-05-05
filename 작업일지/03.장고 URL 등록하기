@@ -1,0 +1,57 @@
+# 나의 첫 번째 Django url 설정하기
+
+# views 모듈 설치하기
+(myvenv) (base) D:\project>pip install views
+Collecting views
+  Downloading https://files.pythonhosted.org/packages/1b/d9/5598d590f9467c364704397cbb0ebc9b33481b84e947c2af31cc1dc9fa11/views-0.3.tar.gz
+Installing collected packages: views
+  Running setup.py install for views ... done
+Successfully installed views-0.3
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# mysite/urls.py 편집하기 
+
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+	path('', include('blog.urls')),
+]
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# 새로 blog/urls.py 파일 작성하기 
+## https://tutorial.djangogirls.org/ko/django_urls/ 참고 
+
+from django.urls import path
+from . import views
+
+urlpatterns = [
+	path('', views.post_list, name='post_list'),
+]
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+# 장고 뷰 만들기
+## https://tutorial.djangogirls.org/ko/django_views/ 참고
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# blog/views.py 편집하기 
+def post_list(request):
+    return render(request, 'blog/post_list.html', {})
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# 템플릿 파일 만들기
+# blog/templates/blog 아래에 post_list.html 생성하기
+## 간단한 내용의 새 파일 생성
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+<html>
+    <p>Hi there!</p>
+    <p>It works!</p>
+</html>
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
